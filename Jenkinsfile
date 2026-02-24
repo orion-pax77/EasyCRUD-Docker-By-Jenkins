@@ -2,8 +2,12 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB_REPO_FRONT = "orionpax77/easycrud-frontend"
-        DOCKERHUB_REPO_BACK = "orionpax77/easycrud-backend"
+        // Docker Hub
+        DOCKERHUB_FRONT = "orionpax77/easycrud-frontend"
+        DOCKERHUB_BACK  = "orionpax77/easycrud-backend"
+
+        // Terraform vars
+        AWS_REGION = "us-east-1"
     }
 
     stages {
@@ -14,15 +18,23 @@ pipeline {
             }
         }
 
-        stage('Build Frontend Image') {
+        stage('Terraform Init & Apply Infra') {
             steps {
-                sh "docker build -t $DOCKERHUB_REPO_FRONT:latest ./frontend"
+                dir('terraform') {
+                    sh '''
+                        terraform init
+                        terraform apply -auto-approve
+                    '''
+                }
             }
         }
 
-        stage('Build Backend Image') {
+        stage('Build Docker Images') {
             steps {
-                sh "docker build -t $DOCKERHUB_REPO_BACK:latest ./backend"
+                sh """
+                docker build -t $DOCKERHUB_FRONT:latest ./frontend
+                docker build -t $DOCKERHUB_BACK:latest ./backend
+                """
             }
         }
 
@@ -33,9 +45,9 @@ pipeline {
                     usernameVariable: 'DOCKERHUB_USER',
                     passwordVariable: 'DOCKERHUB_PASS'
                 )]) {
-                    sh """
+                    sh '''
                     echo $DOCKERHUB_PASS | docker login -u $DOCKERHUB_USER --password-stdin
-                    """
+                    '''
                 }
             }
         }
@@ -43,34 +55,40 @@ pipeline {
         stage('Push Images to Docker Hub') {
             steps {
                 sh """
-                docker push $DOCKERHUB_REPO_FRONT:latest
-                docker push $DOCKERHUB_REPO_BACK:latest
+                docker push $DOCKERHUB_FRONT:latest
+                docker push $DOCKERHUB_BACK:latest
                 """
             }
         }
 
-        stage('Stop Old Containers') {
+        stage('Deploy to Provisioned EC2') {
             steps {
-                sh '''
-                docker rm -f easycrud_frontend || true
-                docker rm -f easycrud_backend || true
-                '''
-            }
-        }
+                script {
+                    def publicIp = sh(
+                        script: "terraform -chdir=terraform output -raw public_ip",
+                        returnStdout: true
+                    ).trim()
 
-        stage('Run Containers') {
-            steps {
-                sh """
-                docker run -d --name easycrud_frontend -p 80:80 $DOCKERHUB_REPO_FRONT:latest
-                docker run -d --name easycrud_backend -p 8081:8081 $DOCKERHUB_REPO_BACK:latest
-                """
+                    sh """
+                    ssh -o StrictHostKeyChecking=no -i /path/to/your/key.pem ubuntu@$publicIp << 'EOF'
+                        docker rm -f easycrud_frontend || true
+                        docker rm -f easycrud_backend || true
+
+                        docker pull $DOCKERHUB_FRONT:latest
+                        docker pull $DOCKERHUB_BACK:latest
+
+                        docker run -d --name easycrud_frontend -p 80:80 $DOCKERHUB_FRONT:latest
+                        docker run -d --name easycrud_backend -p 8081:8081 $DOCKERHUB_BACK:latest
+                    EOF
+                    """
+                }
             }
         }
     }
 
     post {
         success {
-            echo "🚀 Application Deployed Successfully!"
+            echo "🚀 Deployment Completed Successfully!"
         }
         failure {
             echo "❌ Deployment Failed!"
