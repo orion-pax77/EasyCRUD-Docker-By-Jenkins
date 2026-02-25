@@ -122,34 +122,6 @@ sudo systemctl enable jenkins
 ```
 
 ---
-Perfect 👍 Below is your updated documentation section with a **new step added right after Jenkins installation** to change Jenkins port from **8080 → 8081** in a clean GitHub-ready format.
-
-You can directly replace that section in your README.
-
----
-
-## 🛠 Install Jenkins
-
-```bash
-curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | sudo tee \
-  /usr/share/keyrings/jenkins-keyring.asc > /dev/null
-
-echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] \
-  https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
-  /etc/apt/sources.list.d/jenkins.list > /dev/null
-
-sudo apt update
-sudo apt install jenkins -y
-```
-
-Start Jenkins:
-
-```bash
-sudo systemctl start jenkins
-sudo systemctl enable jenkins
-```
-
----
 
 # 🟢 Change Jenkins Default Port (8080 → 8081)
 
@@ -567,5 +539,6 @@ This project demonstrates:
 * ✅ Production-ready Deployment Architecture
 
 ---
+
 
 
