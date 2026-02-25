@@ -6,7 +6,7 @@ data "aws_vpc" "default" {
 }
 
 ###################################
-# Get Subnets
+# Get Default Subnets
 ###################################
 data "aws_subnets" "default" {
   filter {
@@ -16,18 +16,27 @@ data "aws_subnets" "default" {
 }
 
 ###################################
-# Security Group for RDS
+# DB Password Variable (Secure)
+###################################
+variable "db_password" {
+  description = "Database password"
+  type        = string
+  sensitive   = true
+}
+
+###################################
+# Security Group for RDS (Secure)
 ###################################
 resource "aws_security_group" "rds_sg" {
-  name        = "rds-mysql-sg"
-  description = "Allow MySQL access"
+  name        = "rds-mysql-sg-${random_id.suffix.hex}"
+  description = "Allow MySQL access from current IP"
   vpc_id      = data.aws_vpc.default.id
 
   ingress {
     from_port   = 3306
     to_port     = 3306
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]   # ⚠ Open to world (not secure)
+    cidr_blocks = ["YOUR_PUBLIC_IP/32"]  # Replace with your IP
   }
 
   egress {
@@ -42,28 +51,27 @@ resource "aws_security_group" "rds_sg" {
 # DB Subnet Group
 ###################################
 resource "aws_db_subnet_group" "rds_subnet" {
-  name       = "rds-subnet-group"
+  name       = "rds-subnet-${random_id.suffix.hex}"
   subnet_ids = data.aws_subnets.default.ids
 }
 
 ###################################
-# RDS MySQL Instance
+# RDS MariaDB Instance (Free Tier Safe)
 ###################################
 resource "aws_db_instance" "mariadb" {
-  identifier              = "easycrud-mariadb"
+  identifier              = "easycrud-${random_id.suffix.hex}"
   allocated_storage       = 20
   max_allocated_storage   = 20
 
   engine                  = "mariadb"
-  engine_version          = "10.6.14"   # Free-tier supported version
+  engine_version          = "10.6.14"
 
   instance_class          = "db.t3.micro"
+  storage_type            = "gp2"
 
   db_name                 = "easycruddb"
   username                = "admin"
-  password                = "redhat123"
-
-  storage_type            = "gp2"
+  password                = var.db_password
 
   db_subnet_group_name    = aws_db_subnet_group.rds_subnet.name
   vpc_security_group_ids  = [aws_security_group.rds_sg.id]
