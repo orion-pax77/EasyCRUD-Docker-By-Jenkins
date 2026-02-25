@@ -1,11 +1,4 @@
 ###################################
-# Random Suffix (Avoid Duplicate Errors)
-###################################
-resource "random_id" "suffix" {
-  byte_length = 2
-}
-
-###################################
 # Get Default VPC
 ###################################
 data "aws_vpc" "default" {
@@ -13,7 +6,7 @@ data "aws_vpc" "default" {
 }
 
 ###################################
-# Get Default Subnets
+# Get Subnets
 ###################################
 data "aws_subnets" "default" {
   filter {
@@ -23,27 +16,18 @@ data "aws_subnets" "default" {
 }
 
 ###################################
-# DB Password Variable (Secure)
-###################################
-variable "db_password" {
-  description = "Database password"
-  type        = string
-  sensitive   = true
-}
-
-###################################
-# Security Group for RDS (Secure)
+# Security Group for RDS
 ###################################
 resource "aws_security_group" "rds_sg" {
-  name        = "rds-mysql-sg-${random_id.suffix.hex}"
-  description = "Allow MySQL access from current IP"
+  name        = "rds-mariadb-sg"
+  description = "Allow MySQL access"
   vpc_id      = data.aws_vpc.default.id
 
   ingress {
     from_port   = 3306
     to_port     = 3306
     protocol    = "tcp"
-    cidr_blocks = ["YOUR_PUBLIC_IP/32"]  # Replace with your IP
+    cidr_blocks = ["0.0.0.0/0"]   # ⚠ Open to world (not secure)
   }
 
   egress {
@@ -58,27 +42,28 @@ resource "aws_security_group" "rds_sg" {
 # DB Subnet Group
 ###################################
 resource "aws_db_subnet_group" "rds_subnet" {
-  name       = "rds-subnet-${random_id.suffix.hex}"
+  name       = "rds-subnet-group"
   subnet_ids = data.aws_subnets.default.ids
 }
 
 ###################################
-# RDS MariaDB Instance (Free Tier Safe)
+# RDS MySQL Instance
 ###################################
 resource "aws_db_instance" "mariadb" {
-  identifier              = "easycrud-${random_id.suffix.hex}"
+  identifier              = "easycrud-mariadb"
   allocated_storage       = 20
   max_allocated_storage   = 20
 
   engine                  = "mariadb"
-  engine_version          = "10.6.14"
+  engine_version          = "10.6.14"   # Free-tier supported version
 
-  instance_class          = "db.t3.micro"
-  storage_type            = "gp2"
+  instance_class          = "db.t4.micro"
 
   db_name                 = "easycruddb"
   username                = "admin"
-  password                = var.db_password
+  password                = "redhat123"
+
+  storage_type            = "gp2"
 
   db_subnet_group_name    = aws_db_subnet_group.rds_subnet.name
   vpc_security_group_ids  = [aws_security_group.rds_sg.id]
@@ -96,3 +81,4 @@ resource "aws_db_instance" "mariadb" {
     Name = "EasyCRUD-mariadb"
   }
 }
+fix this file
