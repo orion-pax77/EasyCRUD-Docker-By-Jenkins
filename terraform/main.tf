@@ -1,4 +1,11 @@
 ###################################
+# Random Suffix (Avoid Duplicate Errors)
+###################################
+resource "random_id" "suffix" {
+  byte_length = 2
+}
+
+###################################
 # Get Default VPC
 ###################################
 data "aws_vpc" "default" {
