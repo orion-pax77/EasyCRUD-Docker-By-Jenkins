@@ -128,14 +128,21 @@ EOF
 
         stage('Update Frontend .env File') {
             steps {
-                sh '''
-                    if [ -f frontend/.env ]; then
-                        sed -i 's|BACKEND_URL=.*|BACKEND_URL=http://easycrud1-backend:8080|' frontend/.env
-                    else
-                        echo ".env file not found!"
-                        exit 1
-                    fi
-                '''
+                script {
+                    env.EC2_PUBLIC_IP = sh(
+                        script: "curl -s http://checkip.amazonaws.com",
+                        returnStdout: true
+                    ).trim()
+
+                    sh """
+                        if [ -f frontend/.env ]; then
+                            sed -i 's|BACKEND_URL=.*|BACKEND_URL=http://${EC2_PUBLIC_IP}:8080|' frontend/.env
+                        else
+                            echo ".env file not found!"
+                            exit 1
+                        fi
+                    """
+                }
             }
         }
 
