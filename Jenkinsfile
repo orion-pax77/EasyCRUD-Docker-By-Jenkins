@@ -109,7 +109,7 @@ EOF
         stage('Build Backend Image') {
             steps {
                 dir('backend') {
-                    sh 'docker build -t pranavmisal1002/easycrud1-jenkins:backend . --no-cache'
+                    sh 'docker build -t orionpax77/easycrud1-jenkins:backend . --no-cache'
                 }
             }
         }
@@ -121,7 +121,7 @@ EOF
                     docker run -d \
                         --name easycrud1-backend \
                         -p 8080:8080 \
-                        pranavmisal1002/easycrud1-jenkins:backend
+                        orionpax77/easycrud1-jenkins:backend
                 '''
             }
         }
@@ -173,7 +173,7 @@ EOF
         stage('Build Frontend Image') {
             steps {
                 dir('frontend') {
-                    sh 'docker build -t pranavmisal1002/easycrud1-jenkins:frontend . --no-cache'
+                    sh 'docker build -t orionpax77/easycrud1-jenkins:frontend . --no-cache'
                 }
             }
         }
@@ -185,7 +185,7 @@ EOF
                     docker run -d \
                         --name easycrud1-frontend \
                         -p 80:80 \
-                        pranavmisal1002/easycrud1-jenkins:frontend
+                        orionpax77/easycrud1-jenkins:frontend
                 '''
             }
         }
@@ -199,8 +199,8 @@ EOF
                 )]) {
                     sh '''
                         echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
-                        docker push pranavmisal1002/easycrud1-jenkins:backend
-                        docker push pranavmisal1002/easycrud1-jenkins:frontend
+                        docker push orionpax77/easycrud1-jenkins:backend
+                        docker push orionpax77/easycrud1-jenkins:frontend
                         docker logout
                     '''
                 }
