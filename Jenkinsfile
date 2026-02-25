@@ -64,7 +64,7 @@ pipeline {
         stage('Build Backend Image') {
             steps {
                 dir('backend') {
-                    sh "docker build -t orionpax77/easycrud1-jenkins:backend-${IMAGE_TAG} . --no-cache"
+                    sh "docker build -t orionpax77/easycrud1-jenkins:backend . --no-cache"
                 }
             }
         }
