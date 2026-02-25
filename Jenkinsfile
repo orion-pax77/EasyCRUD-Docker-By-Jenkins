@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        AWS_REGION = "us-east-1"
+        AWS_REGION = "eu-north-1"
         DB_PORT    = "3306"
         IMAGE_TAG  = "latest"
     }
@@ -11,7 +11,7 @@ pipeline {
 
         stage('Checkout Code') {
             steps {
-                git branch: 'main', url: 'https://github.com/orion-pax77/EasyCRUD-Docker-By-Jenkins.git'
+                git branch: 'main', url: 'https://github.com/viralmind9/EasyCRUD-Docker-By-Jenkins.git'
             }
         }
 
@@ -26,7 +26,7 @@ pipeline {
                     sh '''
                         terraform -chdir=terraform init -upgrade
                         terraform -chdir=terraform validate
-                        terraform -chdir=terraform apply -auto-approve
+                        terraform -chdir=terraform apply --auto-approve
                     '''
                 }
             }
@@ -92,7 +92,7 @@ EOF
             steps {
                 sh """
                     if [ -f backend/src/main/resources/application.properties ]; then
-                        sed -i 's|spring.datasource.url=.*|spring.datasource.url=jdbc:mariadb://${RDS_ENDPOINT}:${DB_PORT}/student_db|' backend/src/main/resources/application.properties
+                        sed -i 's|spring.datasource.url=.*|spring.datasource.url=jdbc:mariadb://${RDS_ENDPOINT}:${DB_PORT}/student_db?sslMode=trust|' backend/src/main/resources/application.properties
                         sed -i 's|spring.datasource.username=.*|spring.datasource.username=admin|' backend/src/main/resources/application.properties
                         sed -i 's|spring.datasource.password=.*|spring.datasource.password=redhat123|' backend/src/main/resources/application.properties
                         sed -i 's|spring.jpa.hibernate.ddl-auto=.*|spring.jpa.hibernate.ddl-auto=update|' backend/src/main/resources/application.properties
@@ -109,7 +109,7 @@ EOF
         stage('Build Backend Image') {
             steps {
                 dir('backend') {
-                    sh 'docker build -t orionpax77/easycrud1-jenkins:backend . --no-cache'
+                    sh 'docker build -t pranavmisal1002/easycrud1-jenkins:backend . --no-cache'
                 }
             }
         }
@@ -121,7 +121,7 @@ EOF
                     docker run -d \
                         --name easycrud1-backend \
                         -p 8080:8080 \
-                        orionpax77/easycrud1-jenkins:backend
+                        pranavmisal1002/easycrud1-jenkins:backend
                 '''
             }
         }
@@ -142,7 +142,7 @@ EOF
         stage('Build Frontend Image') {
             steps {
                 dir('frontend') {
-                    sh 'docker build -t orionpax77/easycrud1-jenkins:frontend . --no-cache'
+                    sh 'docker build -t pranavmisal1002/easycrud1-jenkins:frontend . --no-cache'
                 }
             }
         }
@@ -154,7 +154,7 @@ EOF
                     docker run -d \
                         --name easycrud1-frontend \
                         -p 80:80 \
-                        orionpax77/easycrud1-jenkins:frontend
+                        pranavmisal1002/easycrud1-jenkins:frontend
                 '''
             }
         }
@@ -168,8 +168,8 @@ EOF
                 )]) {
                     sh '''
                         echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
-                        docker push orionpax77/easycrud1-jenkins:backend
-                        docker push orionpax77/easycrud1-jenkins:frontend
+                        docker push pranavmisal1002/easycrud1-jenkins:backend
+                        docker push pranavmisal1002/easycrud1-jenkins:frontend
                         docker logout
                     '''
                 }
