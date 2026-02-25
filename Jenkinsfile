@@ -51,7 +51,7 @@ pipeline {
          script {
              sh """
                  if [ -f backend/src/main/resources/application.properties ]; then
-                     sed -i 's|spring.datasource.url=.*|spring.datasource.url=jdbc:mysql://${RDS_ENDPOINT}:${DB_PORT}/easycrud-mysql|' backend/src/main/resources/application.properties
+                     sed -i 's|spring.datasource.url=.*|spring.datasource.url=jdbc:mariadb://${RDS_ENDPOINT}:${DB_PORT}/easycrud-mariadb|' backend/src/main/resources/application.properties
                      sed -i 's|spring.datasource.username=.*|spring.datasource.username=admin|' backend/src/main/resources/application.properties
                      sed -i 's|spring.datasource.password=.*|spring.datasource.password=redhat123|' backend/src/main/resources/application.properties
                      sed -i 's|spring.jpa.hibernate.ddl-auto=.*|spring.jpa.hibernate.ddl-auto=update|' backend/src/main/resources/application.properties
