@@ -190,6 +190,40 @@ sudo apt install mysql-client -y
 
 ---
 
+## 🟢 Install AWS CLI
+
+```bash
+sudo snap install aws-cli --classic
+```
+
+Verify installation:
+
+```bash
+aws --version
+```
+
+---
+
+## 🟢 Configure AWS CLI
+
+Run:
+
+```bash
+aws configure
+```
+
+Enter:
+
+* AWS Access Key
+* AWS Secret Access Key
+* Default Region → `us-east-1`
+* Default Output → `json`
+
+> ⚠️ Note:
+> In production environments, AWS credentials should be stored inside **Jenkins Credentials** instead of using `aws configure`. This step is optional if Jenkins credentials are properly configured.
+
+---
+
 # 🟢 STEP 3: Add Credentials in Jenkins
 
 Go to:
@@ -226,6 +260,7 @@ Manage Jenkins → Credentials → Global → Add Credentials
 Click **Save**.
 
 ---
+
 
 # 🟢 STEP 4: Create Jenkins Pipeline (Pipeline Script from SCM)
 
@@ -364,7 +399,7 @@ docker run -d -p 8080:8080 backend-image
 Sets:
 
 ```
-BACKEND_URL=http://easycrud1-backend:8080
+VITE_API_URL=http://easycrud1-backend:8080
 ```
 
 ---
@@ -457,3 +492,4 @@ This project demonstrates:
 * ✅ Production-ready Deployment Architecture
 
 ---
+
