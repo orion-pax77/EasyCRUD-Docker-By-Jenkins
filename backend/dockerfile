@@ -1,7 +1,6 @@
 FROM maven:3.8.5-openjdk-17
 COPY . /opt/
 WORKDIR /opt
-RUN src/main/resources/application.properties
 RUN mvn clean package
 WORKDIR target/
 CMD ["java","-jar","student-registration-backend-0.0.1-SNAPSHOT.jar"]
