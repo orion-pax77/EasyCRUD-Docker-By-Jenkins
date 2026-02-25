@@ -49,10 +49,10 @@ resource "aws_db_subnet_group" "rds_subnet" {
 ###################################
 # RDS MySQL Instance
 ###################################
-resource "aws_db_instance" "mysql" {
-  identifier              = "easycrud-mysql"
+resource "aws_db_instance" "mariadb" {
+  identifier              = "easycrud-mariadb"
   allocated_storage       = 20
-  engine                  = "mysql"
+  engine                  = "mariadb"
   engine_version          = "8.0"
   instance_class          = "db.t3.micro"
   db_name                 = "easycruddb"
@@ -65,6 +65,6 @@ resource "aws_db_instance" "mysql" {
   multi_az                = false
 
   tags = {
-    Name = "EasyCRUD-MySQL"
+    Name = "EasyCRUD-mariadb"
   }
 }
