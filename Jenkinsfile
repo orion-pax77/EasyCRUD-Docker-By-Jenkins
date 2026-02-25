@@ -52,6 +52,10 @@ pipeline {
                     sh """
                         if [ -f backend/src/main/resources/application.properties ]; then
                             sed -i 's|spring.datasource.url=.*|spring.datasource.url=jdbc:mysql://${env.RDS_ENDPOINT}:${env.DB_PORT}/easycrud-mysql|' backend/src/main/resources/application.properties
+                            sed -i 's|spring.datasource.username=admin|' backend/src/main/resources/application.properties
+                            sed -i 's|spring.datasource.password=redhat123|' backend/src/main/resources/application.properties
+                            sed -i 's|spring.jpa.hibernate.ddl-auto=update|' backend/src/main/resources/application.properties
+                            sed -i 's|spring.jpa.show-sql=true|' backend/src/main/resources/application.properties
                         else
                             echo "application.properties not found!"
                             exit 1
