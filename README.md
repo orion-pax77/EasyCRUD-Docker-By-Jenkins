@@ -167,6 +167,16 @@ Save and exit:
 
 ---
 
+## 🟢 Restart Jenkins Service
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl stop jenkins 
+sudo systemctl start jenkins  
+```
+
+---
+
 # Install **Suggested Plugins**.
 
 ---
@@ -525,6 +535,7 @@ This project demonstrates:
 * ✅ Production-ready Deployment Architecture
 
 ---
+
 
 
 
