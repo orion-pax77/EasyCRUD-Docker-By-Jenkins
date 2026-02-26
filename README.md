@@ -103,15 +103,13 @@ java -version
 ## 🛠 Install Jenkins
 
 ```bash
-curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | sudo tee \
-  /usr/share/keyrings/jenkins-keyring.asc > /dev/null
-
-echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] \
+sudo wget -O /etc/apt/keyrings/jenkins-keyring.asc \
+  https://pkg.jenkins.io/debian-stable/jenkins.io-2026.key
+echo "deb [signed-by=/etc/apt/keyrings/jenkins-keyring.asc]" \
   https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
   /etc/apt/sources.list.d/jenkins.list > /dev/null
-
 sudo apt update
-sudo apt install jenkins -y
+sudo apt install jenkins
 ```
 
 Start Jenkins:
@@ -137,7 +135,59 @@ Open browser:
 http://<EC2-PUBLIC-IP>:8080
 ```
 
-Install **Suggested Plugins**.
+# Install **Suggested Plugins**.
+
+
+---
+
+# 🔌 Install Required Jenkins Plugins
+
+After unlocking Jenkins and selecting **Install Suggested Plugins**, you must also install the following additional plugins:
+
+Go to:
+
+```
+Manage Jenkins → Plugins → Available Plugins
+```
+
+Search and install:
+
+---
+
+## ✅ 1️⃣ Pipeline: Stage View Plugin
+
+**Plugin Name:** `Pipeline: Stage View`
+
+🔹 Purpose:
+
+* Provides visual stage-by-stage view of your pipeline
+* Helps monitor build progress
+* Makes debugging easier
+
+After installation, restart Jenkins if required.
+
+---
+
+## ✅ 2️⃣ AWS Credentials Plugin
+
+**Plugin Name:** `AWS Credentials`
+
+🔹 Purpose:
+
+* Allows Jenkins to securely store AWS Access Key & Secret Key
+* Required for Terraform to authenticate with AWS
+* Enables usage of `withAWS` or AWS credential bindings in pipeline
+
+---
+
+## (Optional but Recommended) ✅ Docker Pipeline Plugin
+
+**Plugin Name:** `Docker Pipeline`
+
+🔹 Purpose:
+
+* Enables Docker build and push inside Jenkins pipeline
+* Provides better Docker integration
 
 ---
 
@@ -457,3 +507,4 @@ This project demonstrates:
 * ✅ Production-ready Deployment Architecture
 
 ---
+
